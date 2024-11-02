@@ -5,7 +5,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiRequest } from '@/services/api';
 
 const API_BASE_URL = 'http://localhost:8090/api';
-
 const endpoints = {
     transfer: {
         completed: `${API_BASE_URL}/transfer/download/completed`,
@@ -15,6 +14,7 @@ const endpoints = {
 
 export const DownloadData = () => {
     const [completedRequests, setCompletedRequests] = useState([]);
+    const [isDownloading, setIsDownloading] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -27,27 +27,54 @@ export const DownloadData = () => {
             setCompletedRequests(data);
         } catch (error) {
             console.error('Error fetching completed requests:', error);
+            toast({
+                description: 'Error fetching completed requests',
+                variant: 'destructive',
+            });
         }
     };
 
     const handleDownload = async (requestId, recipientFacilityId) => {
+        setIsDownloading(true);
         try {
-            const response = await apiRequest(`${endpoints.transfer.download(requestId)}?recipientFacilityId=${recipientFacilityId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                },
-                responseType: 'blob'
-            });
+            // Make the request using existing apiRequest
+            const response = await fetch(
+                `${endpoints.transfer.download(requestId)}?recipientFacilityId=${recipientFacilityId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
 
+            if (!response.ok) {
+                throw new Error(`Download failed: ${response.status}`);
+            }
+
+            // Get filename from content-disposition header
+            const contentDisposition = response.headers.get('content-disposition');
+            let filename = 'decrypted_data.xlsx';
+            if (contentDisposition) {
+                const matches = /filename[^;=\n]=((['"]).?\2|[^;\n]*)/.exec(contentDisposition);
+                if (matches != null && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, '');
+                }
+            }
+
+            // Get the blob directly from response
             const blob = await response.blob();
+
+            // Create download link
             const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'decrypted_data.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+
+            // Cleanup
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
 
             toast({
                 description: 'File downloaded successfully',
@@ -56,9 +83,11 @@ export const DownloadData = () => {
         } catch (error) {
             console.error('Error downloading file:', error);
             toast({
-                description: 'Error downloading file',
+                description: error.message || 'Error downloading file',
                 variant: 'destructive',
             });
+        } finally {
+            setIsDownloading(false);
         }
     };
 
@@ -73,31 +102,38 @@ export const DownloadData = () => {
                         No completed transfer requests available.
                     </div>
                 ) : (
-                    <table className="min-w-full bg-white">
-                        <thead>
-                        <tr>
-                            <th className="py-2">Date</th>
-                            <th className="py-2">Description</th>
-                            <th className="py-2">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {completedRequests.map((request) => (
-                            <tr key={request.requestId}>
-                                <td className="border px-4 py-2">{new Date(request.dateTime).toLocaleString()}</td>
-                                <td className="border px-4 py-2">{request.description}</td>
-                                <td className="border px-4 py-2">
-                                    <Button
-                                        type="button"
-                                        onClick={() => handleDownload(request.requestId, request.requestingFacility)}
-                                    >
-                                        Download
-                                    </Button>
-                                </td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white">
+                            <thead>
+                            <tr>
+                                <th className="py-2 px-4 text-left border-b">Date</th>
+                                <th className="py-2 px-4 text-left border-b">Description</th>
+                                <th className="py-2 px-4 text-left border-b">Action</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {completedRequests.map((request) => (
+                                <tr key={request.requestId} className="hover:bg-gray-50">
+                                    <td className="border-b px-4 py-2">
+                                        {new Date(request.dateTime).toLocaleString()}
+                                    </td>
+                                    <td className="border-b px-4 py-2">{request.description}</td>
+                                    <td className="border-b px-4 py-2">
+                                        <Button
+                                            type="button"
+                                            onClick={() => handleDownload(request.requestId, request.requestingFacility)}
+                                            disabled={isDownloading}
+                                            variant="outline"
+                                            size="sm"
+                                        >
+                                            {isDownloading ? 'Downloading...' : 'Download'}
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </CardContent>
         </Card>

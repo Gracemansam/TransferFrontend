@@ -19,47 +19,49 @@ export const DashboardHome = ({ showMessage }) => {
     if (error) return <div>Error: {error}</div>;
 
     return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <h2 className="text-2xl font-bold">Request Overview</h2>
-                </CardHeader>
-                <CardContent>
-                    <div className="h-64">
-                        <LineChart width={600} height={200} data={chartData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="value" stroke="#2563eb" />
-                        </LineChart>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-2 gap-6">
-                <Card>
+        <div className="min-h-screen bg-gray-100 p-6">
+            <div className="space-y-6 max-w-4xl mx-auto">
+                <Card className="shadow-lg">
                     <CardHeader>
-                        <h3 className="text-xl font-bold">Pending Requests</h3>
+                        <h2 className="text-2xl font-bold text-center">Request Overview</h2>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-center">
-                            {pendingRequests}
+                        <div className="h-64">
+                            <LineChart width={600} height={300} data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Line type="monotone" dataKey="value" stroke="#2563eb" />
+                            </LineChart>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <h3 className="text-xl font-bold">Completed Requests</h3>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold text-center">
-                            {completedRequests}
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="shadow-lg">
+                        <CardHeader>
+                            <h3 className="text-xl font-bold text-center">Pending Requests</h3>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-center text-blue-600">
+                                {pendingRequests}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="shadow-lg">
+                        <CardHeader>
+                            <h3 className="text-xl font-bold text-center">Completed Requests</h3>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold text-center text-green-600">
+                                {completedRequests}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     );

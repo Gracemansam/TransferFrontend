@@ -3,18 +3,28 @@ import { Bell } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { apiRequest } from '@/services/api';
+import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 const NotificationBell = () => {
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [selectedNotification, setSelectedNotification] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const fetchUnreadCount = async () => {
         try {
             const count = await apiRequest('http://localhost:8090/api/notifications/unread-count', {
                 method: 'GET'
             });
-            console.log('Unread count:', count); // Debugging
             setUnreadCount(count);
         } catch (error) {
             console.error('Error fetching unread count:', error);
@@ -26,7 +36,6 @@ const NotificationBell = () => {
             const data = await apiRequest('http://localhost:8090/api/notifications/getUnreadNotifications', {
                 method: 'GET'
             });
-            console.log('Notifications:', data); // Debugging
             setNotifications(data);
             setUnreadCount(data.filter(n => !n.read).length);
         } catch (error) {
@@ -56,7 +65,13 @@ const NotificationBell = () => {
         if (!notification.read) {
             await markAsRead(notification.id);
         }
-        alert(`Message: ${notification.message}\nCreated at: ${new Date(notification.createdAt).toLocaleString()}`);
+        setSelectedNotification(notification);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedNotification(null);
     };
 
     return (
@@ -84,7 +99,9 @@ const NotificationBell = () => {
                                 {notifications.map((notification) => (
                                     <div
                                         key={notification.id}
-                                        className={`p-2 rounded ${notification.read ? 'bg-gray-50' : 'bg-blue-50'}`}
+                                        className={`p-2 rounded cursor-pointer hover:bg-gray-100 transition-colors ${
+                                            notification.read ? 'bg-gray-50' : 'bg-blue-50'
+                                        }`}
                                         onClick={() => handleNotificationClick(notification)}
                                     >
                                         <p className="text-sm">
@@ -100,6 +117,33 @@ const NotificationBell = () => {
                     </CardContent>
                 </Card>
             )}
+
+            <AlertDialog open={isModalOpen} onOpenChange={handleCloseModal}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Notification Details
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-4">
+                            {selectedNotification && (
+                                <>
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <p className="text-gray-900">
+                                            {selectedNotification.message}
+                                        </p>
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                        Received: {new Date(selectedNotification.createdAt).toLocaleString()}
+                                    </div>
+                                </>
+                            )}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={handleCloseModal}>Close</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };
