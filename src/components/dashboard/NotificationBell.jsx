@@ -2,16 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { apiRequest } from '@/services/api';
 
 const NotificationBell = () => {
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
+    const fetchUnreadCount = async () => {
+        try {
+            const count = await apiRequest('http://localhost:8090/api/notifications/unread-count', {
+                method: 'GET'
+            });
+            console.log('Unread count:', count); // Debugging
+            setUnreadCount(count);
+        } catch (error) {
+            console.error('Error fetching unread count:', error);
+        }
+    };
+
     const fetchNotifications = async () => {
         try {
-            const response = await fetch(`http://localhost:8090/api/notifications/${localStorage.getItem('facilityId')}`);
-            const data = await response.json();
+            const data = await apiRequest('http://localhost:8090/api/notifications/getUnreadNotifications', {
+                method: 'GET'
+            });
+            console.log('Notifications:', data); // Debugging
             setNotifications(data);
             setUnreadCount(data.filter(n => !n.read).length);
         } catch (error) {
@@ -20,20 +35,28 @@ const NotificationBell = () => {
     };
 
     useEffect(() => {
-        fetchNotifications();
+        fetchUnreadCount();
+        fetchNotifications(); // Initial fetch
         const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
         return () => clearInterval(interval);
     }, []);
 
     const markAsRead = async (notificationId) => {
         try {
-            await fetch(`http://localhost:8090/api/notifications/${notificationId}/read`, {
+            await apiRequest(`http://localhost:8090/api/notifications/${notificationId}/read`, {
                 method: 'POST'
             });
             fetchNotifications(); // Refresh notifications
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }
+    };
+
+    const handleNotificationClick = async (notification) => {
+        if (!notification.read) {
+            await markAsRead(notification.id);
+        }
+        alert(`Message: ${notification.message}\nCreated at: ${new Date(notification.createdAt).toLocaleString()}`);
     };
 
     return (
@@ -62,9 +85,11 @@ const NotificationBell = () => {
                                     <div
                                         key={notification.id}
                                         className={`p-2 rounded ${notification.read ? 'bg-gray-50' : 'bg-blue-50'}`}
-                                        onClick={() => !notification.read && markAsRead(notification.id)}
+                                        onClick={() => handleNotificationClick(notification)}
                                     >
-                                        <p className="text-sm">{notification.message}</p>
+                                        <p className="text-sm">
+                                            {notification.message.split('.Message:')[0]}
+                                        </p>
                                         <p className="text-xs text-gray-500 mt-1">
                                             {new Date(notification.createdAt).toLocaleString()}
                                         </p>

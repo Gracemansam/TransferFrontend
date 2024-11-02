@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Home, FileText, Upload, User, LogOut } from 'lucide-react';
+import { Home, FileText, Upload, Download, History, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const Sidebar = ({ activeView, setActiveView }) => {
@@ -10,6 +10,8 @@ export const Sidebar = ({ activeView, setActiveView }) => {
         { id: 'dashboard', label: 'Dashboard', icon: Home },
         { id: 'send-request', label: 'Send Request', icon: FileText },
         { id: 'upload-data', label: 'Upload Data', icon: Upload },
+        { id: 'download-data', label: 'Download Data', icon: Download },
+        { id: 'data-transfer-history', label: 'Data Transfer History', icon: History },
         { id: 'edit-profile', label: 'Edit Profile', icon: User }
     ];
 

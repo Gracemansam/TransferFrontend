@@ -4,6 +4,8 @@ import { Sidebar } from '../common/Sidebar';
 import { DashboardHome } from './DashboardHome';
 import { SendRequest } from './SendRequest';
 import { UploadData } from './UploadData';
+import { DownloadData } from './DownloadData';
+import { DataTransferHistory } from './DataTransferHistory';
 import { EditProfile } from './EditProfile';
 import NotificationBell from './NotificationBell';
 import { useToast } from '@/components/ui/use-toast';
@@ -28,6 +30,10 @@ export const DashboardLayout = () => {
                 return <SendRequest showMessage={showMessage} />;
             case 'upload-data':
                 return <UploadData showMessage={showMessage} />;
+            case 'download-data':
+                return <DownloadData showMessage={showMessage} />;
+            case 'data-transfer-history':
+                return <DataTransferHistory showMessage={showMessage} />;
             case 'edit-profile':
                 return <EditProfile showMessage={showMessage} />;
             default:

@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { useHospitals } from '@/hooks/useHospitals';
 import { endpoints, apiRequest } from '@/services/api';
-import {toast} from "@/components/ui/use-toast.js";
+import { toast } from "@/components/ui/use-toast.js";
 
 export const SendRequest = ({ showMessage }) => {
     const [selectedHospital, setSelectedHospital] = useState('');
+    const [message, setMessage] = useState('');
     const { hospitals, loading, error, fetchHospitals } = useHospitals();
 
     useEffect(() => {
@@ -29,7 +30,8 @@ export const SendRequest = ({ showMessage }) => {
             await apiRequest(endpoints.transfer.request, {
                 method: 'POST',
                 body: JSON.stringify({
-                    recipientFacility: selectedHospital
+                    recipientFacility: selectedHospital,
+                    message: message
                 })
             });
 
@@ -39,6 +41,7 @@ export const SendRequest = ({ showMessage }) => {
                 variant: "success",
             });
             setSelectedHospital('');
+            setMessage('');
         } catch (error) {
             toast({
                 title: "Request Failed",
@@ -48,8 +51,12 @@ export const SendRequest = ({ showMessage }) => {
         }
     };
 
-    const handleChange = (e) => {
+    const handleHospitalChange = (e) => {
         setSelectedHospital(e.target.value);
+    };
+
+    const handleMessageChange = (e) => {
+        setMessage(e.target.value);
     };
 
     if (loading) return <div>Loading hospitals...</div>;
@@ -70,7 +77,7 @@ export const SendRequest = ({ showMessage }) => {
                         <select
                             name="hospitalId"
                             value={selectedHospital}
-                            onChange={handleChange}
+                            onChange={handleHospitalChange}
                             className="w-full rounded-md border border-input bg-background px-3 py-2"
                         >
                             <option value="" disabled>Select hospital</option>
@@ -80,6 +87,18 @@ export const SendRequest = ({ showMessage }) => {
                                 </option>
                             ))}
                         </select>
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="message" className="text-sm font-medium">
+                            Message
+                        </label>
+                        <textarea
+                            name="message"
+                            value={message}
+                            onChange={handleMessageChange}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2"
+                            rows="4"
+                        />
                     </div>
                     <Button
                         type="submit"

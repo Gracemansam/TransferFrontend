@@ -25,9 +25,11 @@ export const apiRequest = async (endpoint, options = {}) => {
     const token = localStorage.getItem('token');
 
     const defaultHeaders = {
-        'Content-Type': 'application/json',
+        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(token && { Authorization: `Bearer ${token}` })
     };
+
+    console.log('Request Headers:', defaultHeaders);
 
     try {
         const response = await fetch(endpoint, {
@@ -38,13 +40,21 @@ export const apiRequest = async (endpoint, options = {}) => {
             }
         });
 
+        console.log('Response Status:', response.status);
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-
-        const data = await response.json();
-        return data;
+        // Handle different response types
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            return data;
+        } else {
+            const data = await response.blob();
+            return data;
+        }
     } catch (error) {
         console.error('API request failed:', error);
         throw error;
