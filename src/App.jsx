@@ -8,11 +8,13 @@ import { DashboardLayout } from './components/dashboard/DashboardLayout';
 import { LandingPage } from './components/LandingPage';
 import { Toaster } from './components/ui/toaster';
 
-import { useToast } from "@/components/ui/use-toast";
+
+import {AppToastProvider} from "@/components/ui/AppToasterProvider.jsx";
 
 const App = () => {
     return (
         <AuthProvider>
+            <AppToastProvider>
             <Router>
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
@@ -29,6 +31,7 @@ const App = () => {
                 </Routes>
                 <Toaster />
             </Router>
+            </AppToastProvider>
         </AuthProvider>
     );
 };

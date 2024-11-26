@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { useHospitals } from '@/hooks/useHospitals';
 import { endpoints, apiRequest } from '@/services/api';
-import { toast } from "@/components/ui/use-toast.js";
+import { toast } from "@/components/ui/use-toast.jsx";
 
 export const SendRequest = ({ showMessage }) => {
     const [selectedHospital, setSelectedHospital] = useState('');
@@ -38,7 +38,7 @@ export const SendRequest = ({ showMessage }) => {
             toast({
                 title: "Request Sent",
                 description: "Transfer request has been sent successfully.",
-                variant: "success",
+                variant: "success"
             });
             setSelectedHospital('');
             setMessage('');
@@ -46,7 +46,7 @@ export const SendRequest = ({ showMessage }) => {
             toast({
                 title: "Request Failed",
                 description: "Failed to send transfer request. Please try again.",
-                variant: "destructive",
+                variant: "destructive"
             });
         }
     };

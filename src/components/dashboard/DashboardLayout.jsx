@@ -8,7 +8,7 @@ import { DownloadData } from './DownloadData';
 import { DataTransferHistory } from './DataTransferHistory';
 import { EditProfile } from './EditProfile';
 import NotificationBell from './NotificationBell';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.jsx';
 
 export const DashboardLayout = () => {
     const [activeView, setActiveView] = useState('dashboard');

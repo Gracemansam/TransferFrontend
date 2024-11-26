@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast.jsx';
 import { apiRequest } from '@/services/api';
 
 const API_BASE_URL = 'http://localhost:8090/api';
@@ -77,14 +77,16 @@ export const DownloadData = () => {
             window.URL.revokeObjectURL(url);
 
             toast({
-                description: 'File downloaded successfully',
-                variant: 'success',
+                title: "File Downloaded",
+                description: "File downloaded successfully",
+                variant: "success"
             });
         } catch (error) {
             console.error('Error downloading file:', error);
             toast({
-                description: error.message || 'Error downloading file',
-                variant: 'destructive',
+                title: "Request Failed",
+                description: "Error downloading file.",
+                variant: "destructive"
             });
         } finally {
             setIsDownloading(false);

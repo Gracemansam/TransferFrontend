@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+import {toast, useToast} from '@/components/ui/use-toast.jsx';
 import { apiRequest } from '@/services/api';
 
 const API_BASE_URL = 'http://localhost:8090/api';
@@ -84,18 +84,19 @@ export const UploadData = () => {
                 method: 'POST',
                 body: formData,
             });
-
             toast({
-                description: 'File uploaded successfully',
-                variant: 'success',
+                title: "File Uploaded",
+                description: "File uploaded successfully",
+                variant: "success"
             });
             setFile(null);
             fetchPendingRequests();
         } catch (error) {
             console.error('Upload failed:', error);
             toast({
-                description: 'Error uploading file',
-                variant: 'destructive',
+                title: "Request Failed",
+                description: "Error uploading file.",
+                variant: "destructive"
             });
         }
     };

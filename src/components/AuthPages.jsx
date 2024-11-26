@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import {toast, useToast} from "@/components/ui/use-toast.js";
+import {useToast} from "@/components/ui/use-toast.jsx";
+
+
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -111,6 +113,7 @@ const RegisterPage = () => {
     const [hospitals, setHospitals] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { toast } = useToast();
 
     React.useEffect(() => {
         fetchHospitals();
@@ -142,21 +145,21 @@ const RegisterPage = () => {
                 toast({
                     title: "Registration Successful",
                     description: "Your account has been created. Please log in.",
-                    variant: "success",
+                    variant: "success"
                 });
                 navigate('/login');
             } else {
                 toast({
                     title: "Registration Failed",
                     description: data.message || "An error occurred during registration.",
-                    variant: "destructive",
+                    variant: "destructive"
                 });
             }
         } catch (error) {
             toast({
-                title: "Registration Failed",
+                title: "Registration Error",
                 description: "An unexpected error occurred. Please try again.",
-                variant: "destructive",
+                variant: "destructive"
             });
         }
     };

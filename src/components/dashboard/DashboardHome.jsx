@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useTransfers } from '@/hooks/useTransfers';
+import { AuthContext } from '../auth/AuthContext.jsx'
 
 export const DashboardHome = ({ showMessage }) => {
     const { pendingRequests, completedRequests, loading, error, fetchRequests } = useTransfers();
+    const { user } = useContext(AuthContext);
 
     useEffect(() => {
         fetchRequests().catch(() => showMessage('Error fetching requests', 'error'));
@@ -21,6 +23,16 @@ export const DashboardHome = ({ showMessage }) => {
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <div className="space-y-6 max-w-4xl mx-auto">
+
+                <div className="text-center mb-6">
+                    <h1 className="text-3xl font-bold text-blue-800">
+                        Welcome, {user?.firstName} {user?.lastName}
+                    </h1>
+                    <p className="text-xl text-blue-600">
+                        {user?.hospitalName}
+                    </p>
+                </div>
+
                 <Card className="shadow-lg">
                     <CardHeader>
                         <h2 className="text-2xl font-bold text-center">Request Overview</h2>
